@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Punctuation Test Diagnostic</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;1,400&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f6;--surface:#fff;--ink:#14213d;--muted:#51607a;--line:#c9d3e0;--pen:#c4162a;--pen-bg:#fde9ec;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1624;--surface:#182136;--ink:#e8edf6;--muted:#9aa8c0;--line:#2c3a56;--pen:#ff6b7a;--pen-bg:#3a1c26}}
+:root[data-theme="dark"]{--bg:#0f1624;--surface:#182136;--ink:#e8edf6;--muted:#9aa8c0;--line:#2c3a56;--pen:#ff6b7a;--pen-bg:#3a1c26}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Public Sans",system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:28px 18px 60px}
+h1,h2,h3{font-family:Newsreader,Georgia,serif;font-weight:600;line-height:1.2}
+h1{font-size:2.1rem;margin:0 0 8px}
+h2{font-size:1.4rem;margin:36px 0 8px}
+p{margin:0 0 12px;max-width:68ch}
+.lead{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px;margin:16px 0}
+.grid button{font:600 1rem "Public Sans",sans-serif;padding:11px 0;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;cursor:pointer}
+.grid button[aria-pressed="true"]{background:var(--pen-bg);border-color:var(--pen);color:var(--pen);text-decoration:line-through;text-decoration-thickness:2px}
+button:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--pen);outline-offset:2px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.go{font:600 1rem "Public Sans",sans-serif;padding:12px 22px;border:0;border-radius:8px;background:var(--pen);color:#fff;cursor:pointer}
+:root[data-theme="dark"] .go{color:#1a0a0e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .go{color:#1a0a0e}}
+.ghost{font:600 .95rem "Public Sans",sans-serif;padding:11px 16px;border:1.5px solid var(--line);border-radius:8px;background:transparent;color:var(--ink);cursor:pointer}
+.count{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--pen);border-radius:4px 10px 10px 4px;padding:18px 20px;margin:14px 0}
+.card h3{margin:0 0 2px;font-size:1.3rem}
+.meta{color:var(--muted);font-size:.92rem;margin-bottom:10px}
+.tip b{font-weight:600}
+details{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+summary{cursor:pointer;font-weight:600}
+.q{margin:12px 0 0;padding:10px 12px;background:var(--bg);border-radius:6px}
+.q .s{font-family:Newsreader,Georgia,serif;font-size:1.1rem}
+.q .e{color:var(--muted);font-size:.93rem;margin-top:4px}
+a{color:var(--pen)}
+.hidden{display:none}
+.note{font-size:.9rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>Punctuation test diagnostic</h1>
+<p class="lead">Find out which punctuation skills to practice first. Tap the number of every question you missed on the test. Then see your top three areas to work on.</p>
+
+<h2>Which questions did you miss?</h2>
+<div class="grid" id="grid" role="group" aria-label="Question numbers"></div>
+<div class="row">
+<button class="go" id="go">Show my top three</button>
+<button class="ghost" id="clear">Clear all</button>
+<span class="count" id="count" aria-live="polite">0 selected</span>
+</div>
+
+<section id="results" class="hidden" aria-live="polite"></section>
+</main>
+
+<script>
+// Correct answers and explanations, indexed by question number.
+var Q = {
+1:['Go west three blocks and turn right.','“West” is a direction, not a place name, so it is not capitalized.'],
+2:['Yes, sir, I will do it immediately.','Set off a name or title of direct address with commas. “Sir” is capitalized only as part of a name, such as Sir Isaac Newton.'],
+3:['“How,” I asked, “can you always be so forgetful?”','“Can” continues the quotation, so it is lowercase. The question mark goes inside the quotation marks because the quote is a question.'],
+4:['The mayor frowned. He didn’t like what he saw.','Do not join two independent clauses with just a comma. “Mayor” is capitalized only directly before a name (Mayor Bill Jones).'],
+5:['Although we have a competent staff, bottlenecks do occur.','“Staff” is not a proper noun here. A dependent clause that starts a sentence is followed by a comma.'],
+6:['I did not receive the order; therefore, I will not pay my bill.','When a word like therefore, however, or for example joins two independent clauses, put a semicolon before it and usually a comma after it.'],
+7:['We offer a variety of drinks, for instance, beer.','Put a comma before and usually after namely, that is, i.e., for example, e.g., or for instance when a word or phrase follows.'],
+8:['Is that book yours?','The possessive pronoun “yours” takes no apostrophe.'],
+9:['We have much to do; for example, the carpets need vacuuming.','Use a semicolon before “for example” when it joins two independent clauses, and a comma after it.'],
+10:['No, you cannot stay out late tonight.','Use a comma after yes, no, well, why, hello, or hey when it begins a sentence.'],
+11:['Because of his embezzling, the company went bankrupt.','Use a comma to avoid ambiguity.'],
+12:['A proposal that makes harassment of whales illegal has just passed.','Do not set off an essential clause with commas.'],
+13:['You may, of course, call us anytime you wish.','Surround an interrupting expression with commas.'],
+14:['Paolo hurried to the depot to meet his aunt and two cousins.','No commas are needed because there is only one independent clause.'],
+15:['Finish your job; it is imperative that you do.','Two independent clauses with no joining word such as “and” need a semicolon.'],
+16:['Sofia and Aidan’s house was recently painted.','When two people co-own something, put the apostrophe after only the second name.'],
+17:['“Stop it!” I said. “Don’t ever do that again.”','A period after “said” is needed, and the next quoted sentence starts with a capital letter.'],
+18:['I would, therefore, like to have an explanation for the missing cash.','“Therefore” is an interrupter here, not a clause connector, so surround it with commas.'],
+19:['“Would you like to accompany me?” he asked.','The question mark goes inside the quotation marks, and “he” stays lowercase because the sentence continues.'],
+20:['I have always had a mental block against math.','“Math” is a general subject, not a course name, so it is lowercase. No commas are needed in a single independent clause.'],
+21:['He is a strong, healthy man.','Put a comma between adjectives that are interchangeable.'],
+22:['To apply for this very demanding job, you must have previous experience.','Use a comma after a brief phrase that begins a sentence.'],
+23:['Marge, the woman with blond hair, will be our speaker this evening.','Surround the nonessential phrase with commas.'],
+24:['He thought quickly and then answered the question in complete detail.','No commas are needed because “and” does not begin a new independent clause.'],
+25:['He asked if he could be excused.','This is an indirect question, so it takes no question mark.'],
+26:['It is hailing, not raining.','Connect contrasting parts of a sentence with just a comma.'],
+27:['We will grant you immunity if you decide to cooperate with us.','When the independent clause comes first, a comma before the dependent clause is usually unnecessary.'],
+28:['You signed the contract; consequently, you must provide us with the raw materials.','A semicolon can join two independent clauses.'],
+29:['I would like, however, to read the fine print first.','Surround an interrupting expression with commas.'],
+30:['You are required to bring the following: sleeping bag, food, and a sewing kit.','After a complete sentence, introduce a list with a colon. Do not capitalize the first word of the list.'],
+31:['The three companies’ computers were stolen.','Make the noun plural first. If the plural ends in s, add only an apostrophe.'],
+32:['The women’s department is upstairs and to your left.','If the plural does not end in s, add an apostrophe + s.'],
+33:['It’s clear that its paw is hurt.','“Its” is possessive. “It’s” means “it is” or “it has.”'],
+34:['One of the lawyers left her briefcase.','“Lawyers” is plural, not possessive, so no apostrophe.'],
+35:['She asked, “Have you finished reading The Great Gatsby?”','The quotation is a question, so the question mark goes inside the quotation marks.'],
+36:['He was born in Dayton, Ohio, in 1990.','Use a comma between a city and state, and another after the state.'],
+37:['I need to locate four states on the map: Arkansas, Ohio, Illinois, and Utah.','After a complete sentence, introduce a list with a colon.'],
+38:['The note read, “Hi, Camille. I haven’t heard from you in two weeks.”','Use a comma before a name or title when directly addressing someone.'],
+39:['The veterinarian said, “Unless it’s bleeding and doesn’t stop, don’t worry about it.”','Capitalize the first word of a quotation that is a complete sentence.'],
+40:['Wendy said, “This is her karma, not mine.”','Capitalize the first word of a quoted sentence, and put a comma between contrasting parts.'],
+41:['His wife, Juanita, just arrived at the house.','“Juanita” is nonessential information, so it takes commas.'],
+42:['One-fourth of the police force voted for a pay raise of ninety-five dollars a day.','Hyphenate written-out fractions and the numbers twenty-one through ninety-nine.'],
+43:['Bella was born on May 13, 1995, in Harlem.','Use a comma between the day and year, and always one after the year.'],
+44:['A half is slightly less than three-fifths.','Hyphenate written-out fractions, but “half” is only one word.']
+};
+
+// Skill areas: [name, rule of thumb, practice tip, question numbers]
+var C = [
+['Capitalizing common nouns','Capitalize names of specific people, places, and courses. Leave directions, general titles, subjects, and group nouns lowercase.','Reread your last paper and circle every capital letter mid-sentence. Ask of each: is this a specific name, or a general word?',[1,2,4,5,20]],
+['Commas with direct address','Set off the name or title of the person you are speaking to with commas: “Yes, sir, I will.”','Write five sentences that speak to someone by name. Put the name at the start, middle, and end, and check each comma.',[2,38]],
+['Question marks and quotation marks','End punctuation goes inside the quotation marks. A quoted question keeps its question mark even when the sentence continues.','Write a short dialogue of four lines. Make two lines questions, and put the speaker tag after each.',[3,17,19,35]],
+['Capitalizing and introducing quotations','Introduce a quoted sentence with a comma and capitalize its first word. A quote that continues the sentence stays lowercase.','Find a dialogue passage in a book you like. Copy three lines and label why each comma, capital, and quotation mark is there.',[3,17,38,39,40]],
+['Comma splices and run-ons','Two complete sentences cannot be joined by a comma alone. Use a period, a semicolon, or a comma plus and, but, or, so.','Read each of your sentences aloud. If you can stop in the middle and what came before is a complete sentence, check how it is joined.',[4,15]],
+['Commas after introductory words and phrases','Put a comma after a dependent clause or a phrase that starts a sentence. Add one when it prevents confusion.','Rewrite five of your sentences to start with Although, Because, When, or a phrase such as “To finish on time.” Add the commas.',[5,11,22]],
+['Unnecessary commas','Do not put a comma before a dependent clause that follows the main clause, or between the two parts of a compound predicate.','Look for commas before “and,” “because,” or “if.” Ask whether a full sentence with its own subject follows.',[14,24,27,20]],
+['Semicolons and commas with transitions','Use a semicolon before words like therefore, however, and consequently when they join complete sentences, and a comma after.','Write three pairs of related sentences. Join each pair with a semicolon plus a transition and a comma.',[6,9,28]],
+['Commas with “for example” and “for instance”','Put a comma before and after for example, for instance, namely, and that is when a word or phrase follows.','Write a sentence with a list, then add “for example” both after a comma and after a semicolon.',[7,9]],
+['Semicolons between independent clauses','A semicolon can replace a period between two closely related complete sentences.','Take three short, related sentences of your own and join them with semicolons. Check each side stands alone.',[6,9,15,28]],
+['Possessive pronouns and its/it’s','Possessive pronouns (yours, hers, its, theirs) never take an apostrophe. “It’s” always means “it is” or “it has.”','Swap every “it’s” in your writing for “it is.” If the sentence breaks, you need “its.”',[8,33]],
+['Commas after yes, no, and similar words','Put a comma after yes, no, well, why, hello, or hey at the start of a sentence.','Write five replies in a conversation that start with yes, no, well, or why.',[10]],
+['Essential and nonessential information','If you can remove the phrase and the sentence keeps its meaning, set it off with commas. If it identifies who or what, leave commas out.','Take five sentences with “who” or “which,” cover the phrase, and decide whether the meaning survives.',[12,23,41]],
+['Commas with interrupting expressions','Surround words such as however, of course, and therefore with commas when they interrupt a sentence.','Take five plain sentences and drop “however” or “of course” into the middle. Add both commas.',[13,18,29]],
+['Commas between adjectives','Use a comma when you could swap the adjectives or put “and” between them: strong, healthy man.','Test pairs of adjectives by writing them in reverse order and with “and.” If both work, add the comma.',[21]],
+['Commas with contrasting parts','Use a comma before a contrasting phrase such as “not raining.”','Write four sentences with “not ___” contrasts and check for the comma.',[26,40]],
+['Colons before lists','After a complete sentence, a colon introduces a list. Do not use a colon after a verb or preposition.','Write a sentence that introduces a list. Cover the list and check that the sentence is complete before the colon.',[30,37]],
+['Possessive nouns','Singular: add ’s. Plural ending in s: add only an apostrophe. Plural not ending in s: add ’s. Joint owners: put ’s on the last name only.','Write the plural first (company → companies), then add the apostrophe. Practice with child, women, student, and team.',[16,31,32,34]],
+['Indirect questions','A sentence that reports a question takes a period, not a question mark: “He asked if he could go.”','Turn five direct questions into reported speech. Check that each ends with a period.',[25]],
+['Commas in dates and places','Put a comma between city and state and one after the state. Put a comma between day and year and one after the year.','Write your birthday and birthplace in a full sentence. Check both commas.',[36,43]],
+['Hyphens in numbers and fractions','Hyphenate written numbers from twenty-one to ninety-nine and fractions used as one idea, such as three-fifths.','Write out ten numbers and fractions in words, such as 45, 62, 3/4, and 2/5.',[42,44]]
+];
+
+var sel = {};
+var grid = document.getElementById('grid');
+var count = document.getElementById('count');
+var results = document.getElementById('results');
+
+for (var n = 1; n <= 44; n++) {
+  (function(n){
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = n; b.setAttribute('aria-pressed','false');
+    b.setAttribute('aria-label','Question ' + n);
+    b.onclick = function(){
+      sel[n] = !sel[n];
+      b.setAttribute('aria-pressed', sel[n] ? 'true' : 'false');
+      update();
+    };
+    grid.appendChild(b);
+  })(n);
+}
+
+function missed(){ return Object.keys(sel).filter(function(k){return sel[k];}).map(Number).sort(function(a,b){return a-b;}); }
+function update(){ var m = missed().length; count.textContent = m + ' selected'; }
+
+function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+
+document.getElementById('clear').onclick = function(){
+  sel = {};
+  Array.prototype.forEach.call(grid.children,function(b){b.setAttribute('aria-pressed','false');});
+  results.classList.add('hidden'); results.innerHTML = ''; update();
+};
+
+document.getElementById('go').onclick = function(){
+  var m = missed();
+  results.classList.remove('hidden');
+  if (!m.length) {
+    results.innerHTML = '<h2>Nothing to review</h2><p>Select the questions you missed, then tap “Show my top three.”</p>';
+    return;
+  }
+  var ranked = C.map(function(c){
+    var hits = c[3].filter(function(q){return m.indexOf(q) > -1;});
+    return {c:c, hits:hits, pct:hits.length / c[3].length};
+  }).filter(function(r){return r.hits.length;})
+    .sort(function(a,b){ return b.hits.length - a.hits.length || b.pct - a.pct; })
+    .slice(0,3);
+
+  var html = '<h2>Your top ' + (ranked.length === 3 ? 'three' : ranked.length) + ' areas to work on</h2>';
+  html += '<p class="lead">You missed ' + m.length + ' of 44 questions. Start with the first area and work down.</p>';
+  ranked.forEach(function(r, i){
+    var c = r.c;
+    html += '<div class="card"><h3>' + (i+1) + '. ' + esc(c[0]) + '</h3>';
+    html += '<div class="meta">Missed ' + r.hits.length + ' of ' + c[3].length + ' questions in this area</div>';
+    html += '<p class="tip"><b>Rule of thumb:</b> ' + esc(c[1]) + '</p>';
+    html += '<p class="tip"><b>Practice:</b> ' + esc(c[2]) + '</p>';
+    html += '<details><summary>Review your missed questions (' + r.hits.length + ')</summary>';
+    r.hits.forEach(function(q){
+      html += '<div class="q"><div><b>Question ' + q + '.</b> <span class="s">' + esc(Q[q][0]) + '</span></div><div class="e">' + esc(Q[q][1]) + '</div></div>';
+    });
+    html += '</details></div>';
+  });
+  html += '<h2>More practice</h2><p>The Purdue Online Writing Lab has free lessons and exercises on every area above: <a href="https://owl.purdue.edu/owl/general_writing/punctuation/index.html" target="_blank" rel="noopener">Purdue OWL punctuation guide</a>. Search for the name of the area, then retake the test to see what improved.</p>';
+  results.innerHTML = html;
+  results.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
+};
+</script>
+</body>
+</html>
